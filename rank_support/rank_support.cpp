@@ -88,16 +88,20 @@ namespace masks {
         uint64_t sizeR1 = pow((int) log2((b).size()),2);
         uint64_t sizeR2 = log2((b).size());
         uint64_t r3;
-        uint64_t offset = i-i%sizeR2;
+        uint64_t offset = (i-i%sizeR2)&0x3F;
         uint64_t size = i%sizeR2 +1;
-        uint64_t a = (*((b).get()) >> (offset));
+        uint64_t* word = (b).get()+(i>>6);
+        uint64_t a = (*(word) >> (offset));
+
         if(offset+size>64){
-            r3 = a | ((*((b).get()+1) & masks::lo_set[(offset+size)&0x3F]) << (64-offset));
+            int m = *((b).get());
+            r3 = a | ((*(word+1) & masks::lo_set[(offset+size)&0x3F]) << (64-offset));
         }
         else{
             r3 = a & masks::lo_set[size];
         }
         //cout << sizeR1 << endl;
+        int jjjj = (r2)[i/sizeR2];int mmm = __builtin_popcount(r3);
         return ((r1)[i/sizeR1] + (r2)[i/sizeR2] + __builtin_popcount(r3));
     }
     //sizeof(*this) does not include the dynamic length vectors, so the size of the actual table contents are added here

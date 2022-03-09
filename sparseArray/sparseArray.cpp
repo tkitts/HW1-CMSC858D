@@ -24,8 +24,13 @@ class sparseArray{
     }
     void append(string elem, uint64_t pos){
         if (pos < sSup.r.b.size()){
+            uint64_t index = sSup.r.rank1(pos);
+            vector<string>::iterator it;
+
+            it = values.begin()+index;
+
+            values.insert (it,elem);
             sSup.r.b[pos] = 1;
-            values.push_back(elem);
             //then update the support tables
             sSup.r.copy(Rank_support(sSup.r.b));
         }
@@ -117,49 +122,46 @@ class sparseArray{
     }
 };
 int main(){
-    compact::vector<uint64_t> bits{1};
-    bits.assign({1, 0, 0, 1, 0, 1, 1, 1, 0, 1, 0, 0, 1, 0, 1, 1, 1, 0 , 1, 1, 1, 1, 1, 1 , 1,1 ,1 ,1 ,1 ,1 , 1,1 ,1 });//33 long
-    Rank_support rSup(bits);
     sparseArray sA = sparseArray();
-    sA.create(16);
-    string fname = "saveF.txt";
-    string fname2 = "saveF2.txt";
-    rSup.save(fname);
-    Rank_support rS2 = Rank_support();
-    rS2.load(fname);
-    ifstream ifs(fname2, std::ios::binary);
-    sA.append("bok", 0);
-    Select_support sSup(rS2);
-    int a = sSup.select1(9);
-    sA.append("as", 12);
-    sA.append("pre end", 14);
-    sA.append("end", 15);
-    string elem;
-    string file3 = "file3.txt";
-    sA.save(file3);
-    sparseArray sA2 = sparseArray();
-    sA2.load(file3);
-    cout << sA2.get_at_index(14, elem) << endl;
-    cout << sA2.get_at_rank(1,elem) << endl;
-    cout << elem << endl;
-    /*compact::vector<uint64_t> bits{1};
+    sA.create(1000);
+
+    compact::vector<uint64_t> bits{1};
+    bits.assign({1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1});
+    Rank_support rs(bits);
+    cout << rs.rank1(20) << endl;
     time_t timer;
     srand (time(NULL));
-    long len = pow(rand(), 1.8);
+    long length = 1000;
+    long len = length*.05;
     for(long i=0;i<len;i++){
-        bits.push_back(rand() %2);
+        sA.append("meh", i*length/len);
     }
     double seconds;
-    Rank_support rSup(bits);
-    Select_support sSup(rSup);
+    string e;
     auto start = std::chrono::steady_clock::now();
-    for(int i=0;i<10000;i++){
-        sSup.select1(rand() % bits.size());
+    for(int i=0;i<100000;i++){
+        sA.get_at_index(rand() % sA.size(), e);
     }
     auto end = std::chrono::steady_clock::now();
     seconds = (end-start).count();
 
-    cout << len << endl;
-    cout << sSup.overhead() << endl;
-    cout << seconds/1000000000 << endl;*/
+    cout << length << endl;
+    cout << seconds/1000000000 << endl;
+
+    start = std::chrono::steady_clock::now();
+    for(int i=0;i<10000;i++){
+        sA.get_at_rank(rand() % sA.num_elem(), e);
+    }
+    end = std::chrono::steady_clock::now();
+    seconds = (end-start).count();
+
+    cout << seconds/1000000000 << endl;
+    start = std::chrono::steady_clock::now();
+    for(int i=0;i<10000;i++){
+        sA.num_elem_at(rand() % sA.size());
+    }
+    end = std::chrono::steady_clock::now();
+    seconds = (end-start).count();
+
+    cout << seconds/1000000000 << endl;
 }
