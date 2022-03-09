@@ -109,7 +109,8 @@ class sparseArray{
             ifile.read(reinterpret_cast<char *>(&eleSize), sizeof(uint64_t));
             element = new char[eleSize];
             ifile.read(element, eleSize);
-            values.push_back(string(element));
+            values.push_back(string(element, eleSize));
+            delete[] element;
         }
         
         ifile.close();
