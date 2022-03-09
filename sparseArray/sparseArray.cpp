@@ -66,32 +66,50 @@ class sparseArray{
         auto size = sSup.r.b.size();
         sSup.r.save(fname);
         ofstream myfile;
-        myfile.open(fname, ios::out | ios::ate);
+        myfile.open(fname, ios::app);
         uint64_t valSize = values.size();
-        myfile.write(reinterpret_cast<char *>(&valSize), sizeof(valSize));
         uint64_t eleSize;
+        myfile.write(reinterpret_cast<char *>(&valSize), sizeof(uint64_t));
         for(int i=0;i<values.size();i++){
             eleSize = (values[i]).length();
             myfile.write(reinterpret_cast<char *>(&eleSize), sizeof(uint64_t));
+
+            myfile.write(values[i].c_str(), values[i].size());
         }
+
         myfile.close();
-        myfile.open(fname, ios::ate);
-        myfile.put('a');
     }
     void load(string& fname){
         uint64_t valSize;
         uint64_t eleSize;
         int bitVSize;
+        char * element;
         values.clear();
-        sSup.r.load(fname);
 
-        ifstream ifile;
-        ifile.open(fname, ifstream::binary); 
-        ifile.read(reinterpret_cast<char *>(&valSize), sizeof(size_t)); cout << "v" << endl;
+        compact::vector<uint64_t> r1New{1};
+        compact::vector<uint64_t> r2New{1};
+        ifstream ifile(fname, std::ios::binary);
+        uint64_t bits_per_element = compact::get_bits_per_element(fname);
+        uint64_t bits_per_table2 = log2(pow(bits_per_element,2));
+        r1New.set_m_bits(bits_per_element);
+        r1New.deserialize(ifile);
+
+        sSup.r.b.set_m_bits(1);
+        sSup.r.b.deserialize(ifile);
+        r2New.set_m_bits(bits_per_table2);
+        r2New.deserialize(ifile);
+
+        sSup.r.r1.set_m_bits(bits_per_element);
+        sSup.r.r1 = r1New;
+        sSup.r.r2.set_m_bits(bits_per_table2);
+        sSup.r.r2 = r2New;
+
+        ifile.read(reinterpret_cast<char *>(&valSize),sizeof(uint64_t));
         for(int i=0;i<valSize;i++){
-            ifile.read(reinterpret_cast<char *>(&eleSize), sizeof(uint64_t));cout << eleSize << endl;
-            //ifile.read(element, eleSize);
-            //values.push_back(string(element));cout << element << endl;
+            ifile.read(reinterpret_cast<char *>(&eleSize), sizeof(uint64_t));
+            element = new char[eleSize];
+            ifile.read(element, eleSize);
+            values.push_back(string(element));
         }
         
         ifile.close();
@@ -120,9 +138,9 @@ int main(){
     sA.save(file3);
     sparseArray sA2 = sparseArray();
     sA2.load(file3);
-    /*cout << sA2.get_at_index(14, elem) << endl;
+    cout << sA2.get_at_index(14, elem) << endl;
     cout << sA2.get_at_rank(1,elem) << endl;
-    cout << elem << endl;*/
+    cout << elem << endl;
     /*compact::vector<uint64_t> bits{1};
     time_t timer;
     srand (time(NULL));

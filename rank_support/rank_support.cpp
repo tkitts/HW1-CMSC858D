@@ -122,10 +122,8 @@ namespace masks {
 
         b.set_m_bits(1);
         b.deserialize(ifile);
-
         r2New.set_m_bits(bits_per_table2);
-        r2New.deserialize(ifile);cout << "j" << endl;cout << r2New.bits() << endl;
-        ifile.close();
+        r2New.deserialize(ifile);
         r1.set_m_bits(bits_per_element);
         r1 = r1New;
         r2.set_m_bits(bits_per_table2);
