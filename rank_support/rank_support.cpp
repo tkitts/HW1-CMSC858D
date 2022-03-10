@@ -34,13 +34,14 @@ namespace masks {
     //this method constructs the rank support tables based on an input bit vector
     void construct(compact::vector<uint64_t> &inputVect){
             b = inputVect;
+            b.set_m_bits(1);
             if((b).size() == 0){
                 return;
             }
             uint64_t sizeR2 = log2((b).size());//these are the length of bits taken from the original vector
             uint64_t sizeR1 = pow(sizeR2,2);
-            uint64_t R1bitSize = log2((b).size());//these are the number of bits required in each block of the respective table
-            uint64_t R2bitSize = log2(sizeR1);
+            uint64_t R1bitSize = ceil(log2((b).size()));//these are the number of bits required in each block of the respective table
+            uint64_t R2bitSize = ceil(log2(sizeR1));
             uint64_t numR1s = (b).size()/sizeR1 + ((b).size() % sizeR1 != 0 ? 1:0);
             uint64_t numR2s = (b).size()/sizeR2 + ((b).size() % sizeR2 != 0 ? 1:0); //i have to give it the exact number of elements or it allocates extra space in capacity
             r1.clear();
@@ -64,6 +65,7 @@ namespace masks {
             //construct the second table of blocks
             rank = 0;
             for (int i=0;i<(b).size();i+=sizeR2){
+
                 if(i%sizeR1 == 0){//if we've come to the end of a table 1 block reset the rank
                     rank = 0;
                 }
@@ -73,7 +75,6 @@ namespace masks {
                         ++rank;
                     }
                 }
-
             }
     }
     void copy(Rank_support in){
@@ -85,23 +86,25 @@ namespace masks {
         r2 = in.r2;
     }
     uint64_t rank1(uint64_t i){
+        if(i>= b.size()){
+            i = b.size()-1;
+        }
         uint64_t sizeR1 = pow((int) log2((b).size()),2);
         uint64_t sizeR2 = log2((b).size());
         uint64_t r3;
-        uint64_t offset = (i-i%sizeR2)&0x3F;
+        uint64_t offset = (i-i%sizeR2);
         uint64_t size = i%sizeR2 +1;
-        uint64_t* word = (b).get()+(i>>6);
-        uint64_t a = (*(word) >> (offset));
 
+        uint64_t* word = (b.get());
+        word = word+(offset/64);
+        offset = offset % 64;
+        uint64_t w1 = (*word) >> offset;
         if(offset+size>64){
-            int m = *((b).get());
-            r3 = a | ((*(word+1) & masks::lo_set[(offset+size)&0x3F]) << (64-offset));
+            r3 = w1 | ((*(word+1) & masks::lo_set[(offset+size)&0x3F]) << (64-offset));
         }
         else{
-            r3 = a & masks::lo_set[size];
-        }
-        //cout << sizeR1 << endl;
-        int jjjj = (r2)[i/sizeR2];int mmm = __builtin_popcount(r3);
+            r3 = w1 & masks::lo_set[size];
+        } //cout << (r1)[i/sizeR1] << endl;cout << (r2)[i/sizeR2] << endl;cout << __builtin_popcount(r3) << endl;
         return ((r1)[i/sizeR1] + (r2)[i/sizeR2] + __builtin_popcount(r3));
     }
     //sizeof(*this) does not include the dynamic length vectors, so the size of the actual table contents are added here

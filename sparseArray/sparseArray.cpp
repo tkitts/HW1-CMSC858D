@@ -25,9 +25,7 @@ class sparseArray{
     void append(string elem, uint64_t pos){
         if (pos < sSup.r.b.size()){
             uint64_t index = sSup.r.rank1(pos);
-            vector<string>::iterator it;
-
-            it = values.begin()+index;
+            vector<string>::iterator it = values.begin()+index;
 
             values.insert (it,elem);
             sSup.r.b[pos] = 1;
@@ -126,9 +124,8 @@ int main(){
     sA.create(1000);
 
     compact::vector<uint64_t> bits{1};
-    bits.assign({1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1});
+    bits.assign({1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1});
     Rank_support rs(bits);
-    cout << rs.rank1(20) << endl;
     time_t timer;
     srand (time(NULL));
     long length = 1000;
