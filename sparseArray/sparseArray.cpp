@@ -6,8 +6,6 @@
 #include <vector>
 #include <cmath>
 #include "../select_support/select_support.cpp"
-#include <stdlib.h>     /* srand, rand */
-#include <chrono>
 using namespace std;
 class sparseArray{
     vector<string> values;
@@ -29,7 +27,7 @@ class sparseArray{
 
             values.insert (it,elem);
             sSup.r.b[pos] = 1;
-            //then update the support tables
+            //then update the support tables, though this is a terribly time expensive way to do so
             sSup.r.copy(Rank_support(sSup.r.b));
         }
     }
@@ -119,46 +117,3 @@ class sparseArray{
         ifile.close();
     }
 };
-int main(){
-    sparseArray sA = sparseArray();
-    sA.create(1000);
-
-    compact::vector<uint64_t> bits{1};
-    bits.assign({1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1});
-    Rank_support rs(bits);
-    time_t timer;
-    srand (time(NULL));
-    long length = 1000;
-    long len = length*.05;
-    for(long i=0;i<len;i++){
-        sA.append("meh", i*length/len);
-    }
-    double seconds;
-    string e;
-    auto start = std::chrono::steady_clock::now();
-    for(int i=0;i<100000;i++){
-        sA.get_at_index(rand() % sA.size(), e);
-    }
-    auto end = std::chrono::steady_clock::now();
-    seconds = (end-start).count();
-
-    cout << length << endl;
-    cout << seconds/1000000000 << endl;
-
-    start = std::chrono::steady_clock::now();
-    for(int i=0;i<10000;i++){
-        sA.get_at_rank(rand() % sA.num_elem(), e);
-    }
-    end = std::chrono::steady_clock::now();
-    seconds = (end-start).count();
-
-    cout << seconds/1000000000 << endl;
-    start = std::chrono::steady_clock::now();
-    for(int i=0;i<10000;i++){
-        sA.num_elem_at(rand() % sA.size());
-    }
-    end = std::chrono::steady_clock::now();
-    seconds = (end-start).count();
-
-    cout << seconds/1000000000 << endl;
-}

@@ -104,12 +104,12 @@ namespace masks {
         }
         else{
             r3 = w1 & masks::lo_set[size];
-        } //cout << (r1)[i/sizeR1] << endl;cout << (r2)[i/sizeR2] << endl;cout << __builtin_popcount(r3) << endl;
+        }
         return ((r1)[i/sizeR1] + (r2)[i/sizeR2] + __builtin_popcount(r3));
     }
     //sizeof(*this) does not include the dynamic length vectors, so the size of the actual table contents are added here
     uint64_t overhead(){
-        return sizeof(*this)+r1.size()*r1.bits()+r2.size()*r2.bits()+b.bits();
+        return sizeof(*this)*8+r1.size()*r1.bits()+r2.size()*r2.bits()+b.bits();
     }
     void save(string& fname){
         ofstream myfile(fname);
