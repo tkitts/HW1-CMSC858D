@@ -31,6 +31,8 @@ Functions:
         Saves the sparse array to the file fname.
     void load(string& fname) : 
         Loads the sparse array from the file fname.
+GITHUB LINK:
+    https://github.com/tkitts/HW1-CMSC858D
 CITATION:
     Files in the include folder(compact_vector, compact_iterator, const_iterator_traits, parallel_iterator_traits, prefetch_iterator_traits) are from
     <gmarcais, dnbaker and benrobby> (<3/10/2022>) <compact_vector> (release/v0.1.0). https://github.com/gmarcais/compact_vector

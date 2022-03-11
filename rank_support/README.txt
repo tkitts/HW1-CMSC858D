@@ -29,6 +29,8 @@ Functions:
         Saves the rank data structure for this bit vector to the file fname. This rank data structure includes the bit vector.
     void load(string& fname)
         Loads the rank data structure for this bit vector from the file fname. This rank data structure includes the bit vector.
+GITHUB LINK:
+    https://github.com/tkitts/HW1-CMSC858D
 CITATION:
     Files in the include folder(compact_vector, compact_iterator, const_iterator_traits, parallel_iterator_traits, prefetch_iterator_traits) are from
     <gmarcais, dnbaker and benrobby> (<3/10/2022>) <compact_vector> (release/v0.1.0). https://github.com/gmarcais/compact_vector
